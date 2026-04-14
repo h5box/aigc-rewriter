@@ -1,0 +1,739 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIGC-Rewriter | 本地离线中文改写模型</title>
+    <style>
+:root {
+        --bg-a: #f4f7fb;
+        --bg-b: #e7eef8;
+        --card: rgba(255, 255, 255, 0.86);
+        --text: #1a2233;
+        --muted: #5d6a83;
+        --line: #d6e0ee;
+        --brand: #0f56d9;
+        --brand-2: #2a7cf7;
+        --brand-soft: #dce9ff;
+        --ok: #0f8a4a;
+        --warn: #a74d00;
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        color: var(--text);
+        font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(900px 520px at 8% -10%, #ffffff 0%, transparent 58%),
+          radial-gradient(900px 520px at 95% 0%, #dbe8ff 0%, transparent 60%),
+          linear-gradient(155deg, var(--bg-a), var(--bg-b));
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 36px 20px 34px;
+      }
+
+      .hero {
+        border: 1px solid rgba(180, 197, 224, 0.75);
+        border-radius: 22px;
+        background: var(--card);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 18px 46px rgba(26, 42, 77, 0.08);
+        padding: 22px;
+      }
+
+      .hero-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .tag {
+        display: inline-block;
+        font-size: 12px;
+        color: #17408f;
+        background: #e4eeff;
+        border: 1px solid #c3d8ff;
+        border-radius: 999px;
+        padding: 4px 10px;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 5vw, 44px);
+        line-height: 1.05;
+      }
+
+      .hero-sub {
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.72;
+        font-size: 15px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn-link,
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: 0.18s ease;
+      }
+
+      .btn-main {
+        background: linear-gradient(135deg, var(--brand-2), var(--brand));
+        color: #fff;
+      }
+
+      .btn-main:hover {
+        transform: translateY(-1px);
+        filter: saturate(1.05);
+      }
+
+      .btn-soft {
+        background: var(--brand-soft);
+        color: #1a459f;
+      }
+
+      .btn-plain {
+        background: rgba(255, 255, 255, 0.88);
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .cards {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.88);
+        padding: 12px;
+      }
+
+      .card b {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+
+      .card span {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .block {
+        margin-top: 16px;
+        border: 1px solid rgba(180, 197, 224, 0.7);
+        border-radius: var(--radius);
+        background: var(--card);
+        box-shadow: 0 14px 36px rgba(20, 35, 66, 0.08);
+        padding: 16px;
+      }
+
+      .block h2 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .step {
+        border: 1px dashed #bfd1ef;
+        border-radius: 12px;
+        background: rgba(252, 254, 255, 0.9);
+        padding: 11px;
+      }
+
+      .step em {
+        display: inline-block;
+        font-style: normal;
+        font-size: 11px;
+        color: #365ea9;
+        background: #e8f0ff;
+        border-radius: 999px;
+        padding: 2px 8px;
+        margin-bottom: 6px;
+      }
+
+      .step p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .field-label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      textarea,
+      input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 12px 14px;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+      }
+
+      textarea:focus,
+      input:focus {
+        outline: none;
+        border-color: #9ab8f8;
+        box-shadow: 0 0 0 3px rgba(42, 124, 247, 0.14);
+      }
+
+      #inputText {
+        min-height: 170px;
+        resize: vertical;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .status {
+        margin-top: 10px;
+        min-height: 22px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .status.warn {
+        color: var(--warn);
+      }
+
+      .result {
+        margin-top: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 14px;
+        padding: 14px;
+        min-height: 140px;
+        white-space: pre-wrap;
+        line-height: 1.75;
+      }
+
+      .result.empty {
+        color: #8f9bb0;
+      }
+
+      .faq details {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 12px;
+      }
+
+      .faq details + details {
+        margin-top: 8px;
+      }
+
+      .faq summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .faq p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.72;
+        font-size: 14px;
+      }
+
+      .footer {
+        margin-top: 14px;
+        font-size: 12px;
+        color: #73819a;
+        line-height: 1.7;
+      }
+
+      .modal-mask[hidden] {
+        display: none;
+      }
+
+      .modal-mask {
+        position: fixed;
+        inset: 0;
+        padding: 16px;
+        background: rgba(12, 20, 35, 0.46);
+        display: grid;
+        place-items: center;
+        z-index: 999;
+      }
+
+      .modal {
+        width: min(900px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+        border-radius: 18px;
+        border: 1px solid #d4dff0;
+        background: #f5f8fd;
+        box-shadow: 0 20px 56px rgba(18, 25, 44, 0.34);
+      }
+
+      .modal-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-bottom: 1px solid #d7e1f0;
+        background: rgba(245, 248, 253, 0.94);
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .modal-body {
+        padding: 13px 14px 15px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .full {
+        grid-column: 1 / -1;
+      }
+
+      .modal small {
+        color: var(--muted);
+      }
+
+      .modal textarea {
+        min-height: 104px;
+        resize: vertical;
+      }
+
+      .modal-actions {
+        margin-top: 12px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      @media (max-width: 860px) {
+        .cards,
+        .steps {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          padding-top: 28px;
+        }
+
+        .hero-top {
+          flex-direction: column;
+        }
+
+        .cards,
+        .steps,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-top">
+          <div>
+            <span class="tag">离线可用 · 本地部署 · 中文改写</span>
+            <h1>AIGC-Rewriter</h1>
+            <p class="hero-sub">
+              一款面向中文文本改写的本地 GGUF 模型方案：不走云端、不传隐私文本，双击启动即可把机械表达改成更自然的人写风格。
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="btn-link btn-main" href="https://hf-mirror.com/skskk/aigc-rewriter/tree/main" target="_blank" rel="noopener noreferrer">下载模型</a>
+            <a class="btn-link btn-soft" href="./README.md" target="_blank" rel="noopener noreferrer">查看 README</a>
+            <button id="openSettings" class="btn-plain" type="button">高级设置</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>30 秒上手</h2>
+        <div class="steps">
+          <div class="step"><em>STEP 1</em><p>下载 `qwen3-merged-aigc_zhv3-Q4_K_M.gguf` 到当前目录。</p></div>
+          <div class="step"><em>STEP 2</em><p>双击 `启动.bat`，本地自动拉起 `llama-server`。</p></div>
+          <div class="step"><em>STEP 3</em><p>浏览器打开 `http://127.0.0.1:8181`。</p></div>
+          <div class="step"><em>STEP 4</em><p>粘贴文本并点击“开始改写”，直接拿结果。</p></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>在线改写</h2>
+        <label class="field-label" for="inputText">待改写文本</label>
+        <textarea id="inputText" placeholder="粘贴需要改写的中文文本，按 Ctrl/Cmd + Enter 可快速提交。"></textarea>
+
+        <div class="actions">
+          <button id="rewriteBtn" class="btn-main" type="button">开始改写</button>
+          <button id="clearBtn" class="btn-soft" type="button">清空</button>
+          <button id="copyBtn" class="btn-soft" type="button">复制结果</button>
+        </div>
+
+        <div id="status" class="status">准备就绪。</div>
+        <article id="output" class="result empty">改写结果会显示在这里。</article>
+      </section>
+
+      <section class="block faq">
+        <h2>常见问题</h2>
+        <details>
+          <summary>为什么请求失败或超时？</summary>
+          <p>先确认 `启动.bat` 已运行且 `llama-server` 在 `127.0.0.1:8181`；长文本可在设置里调大 `max_tokens` 和超时时间。</p>
+        </details>
+        <details>
+          <summary>默认模型名是什么？</summary>
+          <p>默认读取 `qwen3-merged-aigc_zhv3-Q4_K_M.gguf`。如果你改了文件名，请在“高级设置”里同步修改 `model`。</p>
+        </details>
+        <details>
+          <summary>支持远程 API 吗？</summary>
+          <p>支持。你可以把 `API 地址` 改成完整 URL，前端仍按 OpenAI 风格请求结构发送。</p>
+        </details>
+      </section>
+
+      <p class="footer">
+        免责声明：本项目定位为文本润色与写作辅助工具，请遵守所在平台与机构规范，不用于违规规避检测或任何不当用途。
+      </p>
+    </main>
+
+    <div id="settingsMask" class="modal-mask" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="modal-head">
+          <h2 id="settingsTitle" class="modal-title">高级设置</h2>
+          <button id="closeSettings" class="btn-soft" type="button">关闭</button>
+        </header>
+        <div class="modal-body">
+          <div class="grid">
+            <div>
+              <label class="field-label" for="endpoint">API 地址</label>
+              <input id="endpoint" type="text" placeholder="/v1/chat/completions" />
+              <small>可填相对路径或完整 URL。</small>
+            </div>
+            <div>
+              <label class="field-label" for="model">model</label>
+              <input id="model" type="text" placeholder="qwen3-merged-aigc_zhv3-Q4_K_M.gguf" />
+              <small>留空时默认使用 qwen3-merged-aigc_zhv3-Q4_K_M.gguf。</small>
+            </div>
+            <div>
+              <label class="field-label" for="temperature">temperature</label>
+              <input id="temperature" type="number" min="0" max="2" step="0.01" />
+            </div>
+            <div>
+              <label class="field-label" for="top_p">top_p</label>
+              <input id="top_p" type="number" min="0" max="1" step="0.01" />
+            </div>
+            <div>
+              <label class="field-label" for="max_tokens">max_tokens</label>
+              <input id="max_tokens" type="number" min="1" max="8192" step="1" />
+            </div>
+            <div>
+              <label class="field-label" for="timeoutMs">超时毫秒</label>
+              <input id="timeoutMs" type="number" min="1000" max="600000" step="1000" />
+            </div>
+            <div>
+              <label class="field-label" for="presence_penalty">presence_penalty</label>
+              <input id="presence_penalty" type="number" min="-2" max="2" step="0.01" />
+            </div>
+            <div>
+              <label class="field-label" for="frequency_penalty">frequency_penalty</label>
+              <input id="frequency_penalty" type="number" min="-2" max="2" step="0.01" />
+            </div>
+            <div class="full">
+              <label class="field-label" for="systemPrompt">系统提示词（System）</label>
+              <textarea id="systemPrompt"></textarea>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button id="resetSettings" class="btn-soft" type="button">恢复默认</button>
+            <button id="saveSettings" class="btn-main" type="button">保存设置</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+const STORAGE_KEY = "aigc_rewriter_settings_v1";
+      const USER_REWRITE_PROMPT = "请将下面文本进行降AIGC改写，保留原意与信息完整性，风格自然、不机械：\n\n";
+      const DEFAULTS = {
+        endpoint: "/v1/chat/completions",
+        model: "qwen3-merged-aigc_zhv3-Q4_K_M.gguf",
+        temperature: 0.62,
+        top_p: 0.9,
+        max_tokens: 1024,
+        timeoutMs: 120000,
+        presence_penalty: 0,
+        frequency_penalty: 0.2,
+        systemPrompt:
+          "你是中文文本降AIGC改写专家。你的任务是在不改变原意、不增加事实、不删减关键信息的前提下，将文本改写为自然、流畅、有个人表达痕迹的人类写作风格。避免模板化和机械重复，句式可适当变化。只输出改写后的正文，不要解释。"
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const statusEl = $("status");
+      const outputEl = $("output");
+      const inputEl = $("inputText");
+      const maskEl = $("settingsMask");
+
+      let settings = loadSettings();
+      fillForm(settings);
+
+      $("openSettings").addEventListener("click", openSettings);
+      $("closeSettings").addEventListener("click", closeSettings);
+      $("saveSettings").addEventListener("click", saveSettings);
+      $("resetSettings").addEventListener("click", () => fillForm(DEFAULTS));
+      $("rewriteBtn").addEventListener("click", rewriteText);
+      $("clearBtn").addEventListener("click", () => {
+        inputEl.value = "";
+        outputEl.textContent = "改写结果会显示在这里。";
+        outputEl.classList.add("empty");
+        setStatus("已清空。");
+      });
+
+      $("copyBtn").addEventListener("click", async () => {
+        const text = outputEl.textContent.trim();
+        if (!text || outputEl.classList.contains("empty")) {
+          setStatus("没有可复制的结果。", "warn");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(text);
+          setStatus("结果已复制。", "ok");
+        } catch {
+          setStatus("复制失败，请手动复制。", "warn");
+        }
+      });
+
+      inputEl.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") rewriteText();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !maskEl.hidden) closeSettings();
+      });
+
+      maskEl.addEventListener("click", (e) => {
+        if (e.target === maskEl) closeSettings();
+      });
+
+      function loadSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+          return { ...DEFAULTS, ...saved };
+        } catch {
+          return { ...DEFAULTS };
+        }
+      }
+
+      function fillForm(data) {
+        $("endpoint").value = data.endpoint ?? DEFAULTS.endpoint;
+        $("model").value = data.model ?? DEFAULTS.model;
+        $("temperature").value = data.temperature ?? DEFAULTS.temperature;
+        $("top_p").value = data.top_p ?? DEFAULTS.top_p;
+        $("max_tokens").value = data.max_tokens ?? DEFAULTS.max_tokens;
+        $("timeoutMs").value = data.timeoutMs ?? DEFAULTS.timeoutMs;
+        $("presence_penalty").value = data.presence_penalty ?? DEFAULTS.presence_penalty;
+        $("frequency_penalty").value = data.frequency_penalty ?? DEFAULTS.frequency_penalty;
+        $("systemPrompt").value = data.systemPrompt ?? DEFAULTS.systemPrompt;
+      }
+
+      function readForm() {
+        return {
+          endpoint: $("endpoint").value.trim() || DEFAULTS.endpoint,
+          model: $("model").value.trim() || DEFAULTS.model,
+          temperature: Number($("temperature").value || DEFAULTS.temperature),
+          top_p: Number($("top_p").value || DEFAULTS.top_p),
+          max_tokens: Number($("max_tokens").value || DEFAULTS.max_tokens),
+          timeoutMs: Number($("timeoutMs").value || DEFAULTS.timeoutMs),
+          presence_penalty: Number($("presence_penalty").value || DEFAULTS.presence_penalty),
+          frequency_penalty: Number($("frequency_penalty").value || DEFAULTS.frequency_penalty),
+          systemPrompt: $("systemPrompt").value.trim() || DEFAULTS.systemPrompt
+        };
+      }
+
+      function saveSettings() {
+        settings = readForm();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        closeSettings();
+        setStatus("设置已保存。", "ok");
+      }
+
+      function openSettings() {
+        maskEl.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeSettings() {
+        maskEl.hidden = true;
+        document.body.style.overflow = "";
+      }
+
+      function setStatus(message, type = "") {
+        statusEl.textContent = message;
+        statusEl.className = "status";
+        if (type) statusEl.classList.add(type);
+      }
+
+      function resolveEndpoint(endpoint) {
+        if (/^https?:\/\//i.test(endpoint)) return endpoint;
+        return endpoint.startsWith("/") ? `${location.origin}${endpoint}` : `${location.origin}/${endpoint}`;
+      }
+
+      function buildUserPrompt(text) {
+        return `${USER_REWRITE_PROMPT}${text}`;
+      }
+
+      function pickTextContent(value) {
+        if (typeof value === "string") return value.trim();
+        if (Array.isArray(value)) {
+          return value
+            .map((item) => {
+              if (typeof item === "string") return item;
+              if (item && typeof item.text === "string") return item.text;
+              if (item && typeof item.content === "string") return item.content;
+              return "";
+            })
+            .join("")
+            .trim();
+        }
+        return "";
+      }
+
+      function stripThinkTags(text) {
+        if (!text) return "";
+        return text.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/<\/?think>/gi, "").trim();
+      }
+
+      async function rewriteText() {
+        const source = inputEl.value.trim();
+        if (!source) {
+          setStatus("请先输入待改写文本。", "warn");
+          inputEl.focus();
+          return;
+        }
+
+        settings = readForm();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+
+        const payload = {
+          model: settings.model || DEFAULTS.model,
+          messages: [
+            { role: "system", content: settings.systemPrompt },
+            { role: "user", content: buildUserPrompt(source) }
+          ],
+          temperature: settings.temperature,
+          top_p: settings.top_p,
+          max_tokens: settings.max_tokens,
+          presence_penalty: settings.presence_penalty,
+          frequency_penalty: settings.frequency_penalty,
+          reasoning: "off",
+          reasoning_format: "none",
+          chat_template_kwargs: { enable_thinking: false },
+          stream: false
+        };
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), settings.timeoutMs || DEFAULTS.timeoutMs);
+
+        setStatus("正在改写，请稍候...");
+        $("rewriteBtn").disabled = true;
+        try {
+          const res = await fetch(resolveEndpoint(settings.endpoint), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            const msg = data?.error?.message || JSON.stringify(data);
+            throw new Error(msg);
+          }
+
+          const msg = data?.choices?.[0]?.message ?? {};
+          const rawContent =
+            pickTextContent(msg.content) ||
+            pickTextContent(msg.reasoning_content) ||
+            pickTextContent(data?.choices?.[0]?.text);
+          const content = stripThinkTags(rawContent);
+          if (!content) {
+            if (rawContent) throw new Error("模型仅返回思考内容，未输出最终改写文本。");
+            throw new Error("模型返回为空。");
+          }
+
+          outputEl.textContent = content;
+          outputEl.classList.remove("empty");
+          setStatus("改写完成。", "ok");
+        } catch (err) {
+          const message = err?.name === "AbortError" ? "请求超时，请调大超时或缩短输入。" : `请求失败：${err.message}`;
+          setStatus(message, "warn");
+        } finally {
+          clearTimeout(timer);
+          $("rewriteBtn").disabled = false;
+        }
+      }
+
+    </script>
+  </body>
+</html>
+
+
