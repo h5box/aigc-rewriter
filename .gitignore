@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.gradio/
+.pyright/
+llama-b8721-bin-win-vulkan-x64/
+qwen3-merged-aigc_zhv3-Q4_K_M.gguf
+*.pyc
