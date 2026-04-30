@@ -36,6 +36,9 @@
 
 补齐后，再运行 `启动.bat`。
 
+## 关于闪退
+补齐VC运行时，官网下载：[https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version](https://aka.ms/vc14/vc_redist.x86.exe)
+
 ## 手动启动命令（PowerShell）
 
 ```powershell
